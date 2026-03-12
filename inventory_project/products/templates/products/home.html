@@ -228,15 +228,15 @@
             <div class="summary">
                 <div class="card">
                     <span>Categories</span>
-                    <strong>&mdash;</strong>
+                    <strong>{{ category_count }}</strong>
                 </div>
                 <div class="card">
                     <span>Products</span>
-                    <strong>&mdash;</strong>
+                    <strong>{{ product_count }}</strong>
                 </div>
                 <div class="card">
                     <span>Total Units</span>
-                    <strong>&mdash;</strong>
+                    <strong>{{ total_quantity }}</strong>
                 </div>
             </div>
         </section>
@@ -244,38 +244,57 @@
         <section class="single-screen">
             <article class="panel">
                 <h2>Add Category</h2>
-                <div class="form-stack">
+                <form method="post" class="form-stack">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="category">
                     <div>
                         <label for="{{ category_form.name.id_for_label }}">Category Name</label>
                         {{ category_form.name }}
+                        {% for error in category_form.name.errors %}
+                            <ul class="field-errors"><li>{{ error }}</li></ul>
+                        {% endfor %}
                     </div>
-                    <button type="button">Save Category</button>
-                </div>
+                    <button type="submit">Save Category</button>
+                </form>
             </article>
 
             <article class="panel">
                 <h2>Add Product</h2>
-                <div class="form-grid form-stack">
-                    <div>
-                        <label for="{{ product_form.name.id_for_label }}">Product Name</label>
-                        {{ product_form.name }}
+                <form method="post" class="form-stack">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="product">
+                    <div class="form-grid">
+                        <div>
+                            <label for="{{ product_form.name.id_for_label }}">Product Name</label>
+                            {{ product_form.name }}
+                            {% for error in product_form.name.errors %}
+                                <ul class="field-errors"><li>{{ error }}</li></ul>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label for="{{ product_form.category.id_for_label }}">Category</label>
+                            {{ product_form.category }}
+                            {% for error in product_form.category.errors %}
+                                <ul class="field-errors"><li>{{ error }}</li></ul>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label for="{{ product_form.price.id_for_label }}">Price</label>
+                            {{ product_form.price }}
+                            {% for error in product_form.price.errors %}
+                                <ul class="field-errors"><li>{{ error }}</li></ul>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label for="{{ product_form.quantity.id_for_label }}">Quantity</label>
+                            {{ product_form.quantity }}
+                            {% for error in product_form.quantity.errors %}
+                                <ul class="field-errors"><li>{{ error }}</li></ul>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div>
-                        <label for="{{ product_form.category.id_for_label }}">Category</label>
-                        {{ product_form.category }}
-                    </div>
-                    <div>
-                        <label for="{{ product_form.price.id_for_label }}">Price</label>
-                        {{ product_form.price }}
-                    </div>
-                    <div>
-                        <label for="{{ product_form.quantity.id_for_label }}">Quantity</label>
-                        {{ product_form.quantity }}
-                    </div>
-                </div>
-                <div class="form-stack">
-                    <button type="button">Save Product</button>
-                </div>
+                    <button type="submit">Save Product</button>
+                </form>
             </article>
         </section>
 
@@ -290,6 +309,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ category.name }}</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </article>
@@ -307,6 +332,15 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category.name }}</td>
+                                <td>${{ product.price }}</td>
+                                <td>{{ product.quantity }}</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </article>
