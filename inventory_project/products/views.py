@@ -23,8 +23,17 @@ def home(request):
 				product_form.save()
 				return redirect('home')
 
+	search_query = request.GET.get('q', '').strip()
+	filter_category = request.GET.get('category', '').strip()
+
 	categories = Category.objects.order_by('name')
 	products = Product.objects.select_related('category').order_by('-created_at')
+
+	if search_query:
+		products = products.filter(name__icontains=search_query)
+	if filter_category:
+		products = products.filter(category_id=filter_category)
+
 	total_quantity = Product.objects.aggregate(t=Sum('quantity'))['t'] or 0
 
 	context = {
@@ -33,8 +42,10 @@ def home(request):
 		'categories': categories,
 		'products': products,
 		'category_count': categories.count(),
-		'product_count': products.count(),
+		'product_count': Product.objects.count(),
 		'total_quantity': total_quantity,
+		'search_query': search_query,
+		'filter_category': filter_category,
 	}
 	return render(request, 'products/home.html', context)
 

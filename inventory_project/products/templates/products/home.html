@@ -188,6 +188,46 @@
             cursor: pointer;
         }
 
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            flex: 1 1 160px;
+            padding: 10px 12px;
+            margin: 0;
+        }
+
+        .filter-bar button {
+            flex: 0 0 auto;
+            width: auto;
+            padding: 10px 18px;
+        }
+
+        .filter-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        .filter-meta a {
+            color: #c0392b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .filter-meta a:hover {
+            text-decoration: underline;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -340,6 +380,31 @@
 
             <article class="panel">
                 <h2>Products</h2>
+
+                <form method="get" action="" class="filter-bar">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Search by product name&hellip;">
+                    <select name="category">
+                        <option value="">All categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.pk }}" {% if filter_category == cat.pk|stringformat:'s' %}selected{% endif %}>
+                                {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Filter</button>
+                </form>
+
+                {% if search_query or filter_category %}
+                    <div class="filter-meta">
+                        <span>{{ products|length }} result{{ products|length|pluralize }} found</span>
+                        <a href="{% url 'home' %}">&#x2715; Clear filters</a>
+                    </div>
+                {% endif %}
+
                 <table>
                     <thead>
                         <tr>
