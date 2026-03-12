@@ -341,6 +341,42 @@
             color: var(--muted);
         }
 
+        tr.low-stock {
+            background: #fff6f6;
+        }
+
+        tr.low-stock td {
+            border-bottom-color: #fcd4d4;
+        }
+
+        .badge-low-stock {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            background: #fde8e8;
+            color: #c0392b;
+            border: 1px solid #f5c6c6;
+            border-radius: 6px;
+            vertical-align: middle;
+        }
+
+        .card-warning--active {
+            border-color: #f5c6c6;
+            background: #fff6f6;
+        }
+
+        .card-warning--active span {
+            color: #c0392b;
+        }
+
+        .card-warning--active strong {
+            color: #c0392b;
+        }
+
         @media (max-width: 820px) {
             .page {
                 width: min(100% - 20px, 1100px);
@@ -383,6 +419,10 @@
                 <div class="card">
                     <span>Total Units</span>
                     <strong>{{ total_quantity }}</strong>
+                </div>
+                <div class="card card-warning{% if low_stock_count %} card-warning--active{% endif %}">
+                    <span>Low Stock</span>
+                    <strong>{{ low_stock_count }}</strong>
                 </div>
             </div>
         </section>
@@ -518,12 +558,17 @@
                     </thead>
                     <tbody>
                         {% for product in products %}
-                            <tr>
+                            <tr{% if product.quantity <= low_stock_threshold %} class="low-stock"{% endif %}>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.category.name }}</td>
                                 <td>${{ product.price }}</td>
-                                <td>{{ product.quantity }}</td>
+                                <td>
+                                    {{ product.quantity }}
+                                    {% if product.quantity <= low_stock_threshold %}
+                                        <span class="badge-low-stock">Low Stock</span>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     <div style="display:flex;gap:6px;">
                                         <a href="{% url 'edit_product' product.pk %}" class="btn-edit">Edit</a>

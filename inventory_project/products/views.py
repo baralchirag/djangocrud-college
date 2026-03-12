@@ -34,7 +34,10 @@ def home(request):
 	if filter_category:
 		products = products.filter(category_id=filter_category)
 
+	LOW_STOCK_THRESHOLD = 5
+
 	total_quantity = Product.objects.aggregate(t=Sum('quantity'))['t'] or 0
+	low_stock_count = Product.objects.filter(quantity__lte=LOW_STOCK_THRESHOLD).count()
 
 	context = {
 		'category_form': category_form,
@@ -44,6 +47,8 @@ def home(request):
 		'category_count': categories.count(),
 		'product_count': Product.objects.count(),
 		'total_quantity': total_quantity,
+		'low_stock_count': low_stock_count,
+		'low_stock_threshold': LOW_STOCK_THRESHOLD,
 		'search_query': search_query,
 		'filter_category': filter_category,
 	}
