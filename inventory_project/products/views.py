@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import ExpressionWrapper, F, FloatField, Max, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CategoryForm, ProductForm
@@ -36,8 +36,25 @@ def home(request):
 
 	LOW_STOCK_THRESHOLD = 5
 
-	total_quantity = Product.objects.aggregate(t=Sum('quantity'))['t'] or 0
-	low_stock_count = Product.objects.filter(quantity__lte=LOW_STOCK_THRESHOLD).count()
+	stock_value_expr = ExpressionWrapper(
+		F('price') * F('quantity'), output_field=FloatField()
+	)
+	agg = Product.objects.aggregate(
+		total_qty=Sum('quantity'),
+		total_value=Sum(stock_value_expr),
+		max_price=Max('price'),
+	)
+	total_quantity  = agg['total_qty']   or 0
+	total_value     = agg['total_value'] or 0
+	max_price       = agg['max_price']   or 0
+
+	out_of_stock_count = Product.objects.filter(quantity=0).count()
+	low_stock_count    = Product.objects.filter(quantity__gt=0, quantity__lte=LOW_STOCK_THRESHOLD).count()
+
+	# annotate filtered queryset with per-row stock value
+	products = products.annotate(
+		stock_value=ExpressionWrapper(F('price') * F('quantity'), output_field=FloatField())
+	)
 
 	context = {
 		'category_form': category_form,
@@ -47,6 +64,9 @@ def home(request):
 		'category_count': categories.count(),
 		'product_count': Product.objects.count(),
 		'total_quantity': total_quantity,
+		'total_value': total_value,
+		'max_price': max_price,
+		'out_of_stock_count': out_of_stock_count,
 		'low_stock_count': low_stock_count,
 		'low_stock_threshold': LOW_STOCK_THRESHOLD,
 		'search_query': search_query,

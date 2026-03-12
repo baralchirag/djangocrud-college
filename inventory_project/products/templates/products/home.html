@@ -425,6 +425,20 @@
                     <strong>{{ low_stock_count }}</strong>
                 </div>
             </div>
+            <div class="summary" style="margin-top:10px;">
+                <div class="card">
+                    <span>Total Stock Value</span>
+                    <strong>${{ total_value|floatformat:2 }}</strong>
+                </div>
+                <div class="card">
+                    <span>Highest Price</span>
+                    <strong>${{ max_price|floatformat:2 }}</strong>
+                </div>
+                <div class="card card-warning{% if out_of_stock_count %} card-warning--active{% endif %}">
+                    <span>Out of Stock</span>
+                    <strong>{{ out_of_stock_count }}</strong>
+                </div>
+            </div>
         </section>
 
         <section class="single-screen">
@@ -553,6 +567,7 @@
                             <th>Category</th>
                             <th>Price</th>
                             <th>Quantity</th>
+                            <th>Stock Value</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -565,10 +580,13 @@
                                 <td>${{ product.price }}</td>
                                 <td>
                                     {{ product.quantity }}
-                                    {% if product.quantity <= low_stock_threshold %}
+                                    {% if product.quantity == 0 %}
+                                        <span class="badge-low-stock" style="background:#fde8e8;color:#7b1111;border-color:#f5c6c6;">Out of Stock</span>
+                                    {% elif product.quantity <= low_stock_threshold %}
                                         <span class="badge-low-stock">Low Stock</span>
                                     {% endif %}
                                 </td>
+                                <td>${{ product.stock_value|floatformat:2 }}</td>
                                 <td>
                                     <div style="display:flex;gap:6px;">
                                         <a href="{% url 'edit_product' product.pk %}" class="btn-edit">Edit</a>
