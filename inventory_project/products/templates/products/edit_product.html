@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit {{ product.name }}</title>
+    <style>
+        :root {
+            --background: #edf4fb;
+            --panel: rgba(250, 252, 255, 0.9);
+            --panel-strong: #ffffff;
+            --text: #142235;
+            --muted: #607086;
+            --accent: #1d5fbf;
+            --accent-deep: #123d7a;
+            --border: rgba(20, 34, 53, 0.1);
+            --shadow: 0 20px 50px rgba(34, 76, 136, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(29, 95, 191, 0.14), transparent 30%),
+                radial-gradient(circle at right, rgba(39, 127, 182, 0.12), transparent 24%),
+                linear-gradient(180deg, #f7fbff 0%, var(--background) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            width: min(520px, calc(100% - 32px));
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .back-link {
+            font-size: 0.88rem;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .form-stack {
+            display: grid;
+            gap: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            font: inherit;
+            background: var(--panel-strong);
+            color: var(--text);
+            box-sizing: border-box;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        button[type="submit"] {
+            flex: 1;
+            padding: 13px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        a.btn-cancel {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 13px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--muted);
+            font: inherit;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a.btn-cancel:hover { border-color: var(--accent); color: var(--accent); }
+
+        .field-errors {
+            margin: 6px 0 0;
+            padding: 0;
+            list-style: none;
+            color: #9f1d1d;
+            font-size: 0.88rem;
+        }
+
+        @media (max-width: 540px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .card { padding: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1>Edit Product</h1>
+            <a href="{% url 'home' %}" class="back-link">&#8592; Back to inventory</a>
+        </div>
+
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.name.id_for_label }}">Product Name</label>
+                {{ form.name }}
+                {% for error in form.name.errors %}
+                    <ul class="field-errors"><li>{{ error }}</li></ul>
+                {% endfor %}
+            </div>
+
+            <div>
+                <label for="{{ form.category.id_for_label }}">Category</label>
+                {{ form.category }}
+                {% for error in form.category.errors %}
+                    <ul class="field-errors"><li>{{ error }}</li></ul>
+                {% endfor %}
+            </div>
+
+            <div class="form-grid">
+                <div>
+                    <label for="{{ form.price.id_for_label }}">Price</label>
+                    {{ form.price }}
+                    {% for error in form.price.errors %}
+                        <ul class="field-errors"><li>{{ error }}</li></ul>
+                    {% endfor %}
+                </div>
+                <div>
+                    <label for="{{ form.quantity.id_for_label }}">Quantity</label>
+                    {{ form.quantity }}
+                    {% for error in form.quantity.errors %}
+                        <ul class="field-errors"><li>{{ error }}</li></ul>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'home' %}" class="btn-cancel">Cancel</a>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

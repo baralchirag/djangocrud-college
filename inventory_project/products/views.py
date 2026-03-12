@@ -60,3 +60,15 @@ def delete_product(request, pk):
 	if request.method == 'POST':
 		get_object_or_404(Product, pk=pk).delete()
 	return redirect('home')
+
+
+def edit_product(request, pk):
+	product = get_object_or_404(Product, pk=pk)
+	if request.method == 'POST':
+		form = ProductForm(request.POST, instance=product)
+		if form.is_valid():
+			form.save()
+			return redirect('home')
+	else:
+		form = ProductForm(instance=product)
+	return render(request, 'products/edit_product.html', {'form': form, 'product': product})

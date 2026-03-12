@@ -188,6 +188,18 @@
             cursor: pointer;
         }
 
+        a.btn-edit {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            background: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
         .filter-bar {
             display: flex;
             gap: 10px;
@@ -425,10 +437,13 @@
                                 <td>${{ product.price }}</td>
                                 <td>{{ product.quantity }}</td>
                                 <td>
-                                    <form method="post" action="{% url 'delete_product' product.pk %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
+                                    <div style="display:flex;gap:6px;">
+                                        <a href="{% url 'edit_product' product.pk %}" class="btn-edit">Edit</a>
+                                        <form method="post" action="{% url 'delete_product' product.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
