@@ -56,6 +56,18 @@ def delete_category(request, pk):
 	return redirect('home')
 
 
+def edit_category(request, pk):
+	category = get_object_or_404(Category, pk=pk)
+	if request.method == 'POST':
+		form = CategoryForm(request.POST, instance=category)
+		if form.is_valid():
+			form.save()
+			return redirect('home')
+	else:
+		form = CategoryForm(instance=category)
+	return render(request, 'products/edit_category.html', {'form': form, 'category': category})
+
+
 def delete_product(request, pk):
 	if request.method == 'POST':
 		get_object_or_404(Product, pk=pk).delete()

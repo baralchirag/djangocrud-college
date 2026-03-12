@@ -379,10 +379,13 @@
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ category.name }}</td>
                                 <td>
-                                    <form method="post" action="{% url 'delete_category' category.pk %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
+                                    <div style="display:flex;gap:6px;">
+                                        <a href="{% url 'edit_category' category.pk %}" class="btn-edit">Edit</a>
+                                        <form method="post" action="{% url 'delete_category' category.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
