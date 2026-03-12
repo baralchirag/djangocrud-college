@@ -176,6 +176,18 @@
             font-size: 0.92rem;
         }
 
+        button.btn-delete {
+            width: auto;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            background: #c0392b;
+            border-color: #c0392b;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -306,6 +318,7 @@
                         <tr>
                             <th>#</th>
                             <th>Name</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -313,6 +326,12 @@
                             <tr>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ category.name }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'delete_category' category.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-delete">Delete</button>
+                                    </form>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -329,6 +348,7 @@
                             <th>Category</th>
                             <th>Price</th>
                             <th>Quantity</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -339,6 +359,12 @@
                                 <td>{{ product.category.name }}</td>
                                 <td>${{ product.price }}</td>
                                 <td>{{ product.quantity }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'delete_product' product.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-delete">Delete</button>
+                                    </form>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -1,5 +1,5 @@
 from django.db.models import Sum
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CategoryForm, ProductForm
 from .models import Category, Product
@@ -37,3 +37,15 @@ def home(request):
 		'total_quantity': total_quantity,
 	}
 	return render(request, 'products/home.html', context)
+
+
+def delete_category(request, pk):
+	if request.method == 'POST':
+		get_object_or_404(Category, pk=pk).delete()
+	return redirect('home')
+
+
+def delete_product(request, pk):
+	if request.method == 'POST':
+		get_object_or_404(Product, pk=pk).delete()
+	return redirect('home')
