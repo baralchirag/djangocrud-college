@@ -188,6 +188,88 @@
             cursor: pointer;
         }
 
+        /* ── Delete modal ── */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 20, 40, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal {
+            width: min(420px, calc(100% - 32px));
+            background: var(--panel-strong);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: 0 32px 80px rgba(10, 20, 40, 0.25);
+            padding: 32px;
+            animation: modal-in 0.18s ease;
+        }
+
+        @keyframes modal-in {
+            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)   scale(1); }
+        }
+
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #fde8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 18px;
+        }
+
+        .modal h3 {
+            margin: 0 0 8px;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .modal p {
+            margin: 0 0 24px;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+
+        .modal-actions .btn-cancel-modal {
+            background: transparent;
+            color: var(--muted);
+        }
+
+        .modal-actions .btn-confirm-delete {
+            background: #c0392b;
+            border-color: #c0392b;
+            color: #fff;
+        }
+
         a.btn-edit {
             display: inline-block;
             padding: 6px 14px;
@@ -381,9 +463,12 @@
                                 <td>
                                     <div style="display:flex;gap:6px;">
                                         <a href="{% url 'edit_category' category.pk %}" class="btn-edit">Edit</a>
-                                        <form method="post" action="{% url 'delete_category' category.pk %}">
+                                        <form method="post" action="{% url 'delete_category' category.pk %}" class="delete-form">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn-delete">Delete</button>
+                                            <button type="button" class="btn-delete"
+                                                data-title="Delete Category"
+                                                data-message="Delete &ldquo;{{ category.name }}&rdquo;? All products in this category will also be deleted."
+                                                onclick="openDeleteModal(this)">Delete</button>
                                         </form>
                                     </div>
                                 </td>
@@ -442,9 +527,12 @@
                                 <td>
                                     <div style="display:flex;gap:6px;">
                                         <a href="{% url 'edit_product' product.pk %}" class="btn-edit">Edit</a>
-                                        <form method="post" action="{% url 'delete_product' product.pk %}">
+                                        <form method="post" action="{% url 'delete_product' product.pk %}" class="delete-form">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn-delete">Delete</button>
+                                            <button type="button" class="btn-delete"
+                                                data-title="Delete Product"
+                                                data-message="Delete &ldquo;{{ product.name }}&rdquo;? This action cannot be undone."
+                                                onclick="openDeleteModal(this)">Delete</button>
                                         </form>
                                     </div>
                                 </td>
@@ -455,5 +543,48 @@
             </article>
         </section>
     </main>
+
+    <!-- Delete confirmation modal -->
+    <div class="modal-backdrop" id="deleteModal">
+        <div class="modal">
+            <div class="modal-icon">&#128465;</div>
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn-confirm-delete" id="modalConfirmBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingForm = null;
+
+        function openDeleteModal(btn) {
+            pendingForm = btn.closest('.delete-form');
+            document.getElementById('modalTitle').textContent   = btn.dataset.title;
+            document.getElementById('modalMessage').innerHTML   = btn.dataset.message;
+            document.getElementById('deleteModal').classList.add('open');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('open');
+            pendingForm = null;
+        }
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', function () {
+            if (pendingForm) pendingForm.submit();
+        });
+
+        // Close on backdrop click
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeDeleteModal();
+        });
+    </script>
 </body>
 </html>
