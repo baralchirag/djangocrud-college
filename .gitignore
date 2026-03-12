@@ -1,1 +1,13 @@
-/venv
+# Virtual environment
+venv/
+*.pyc
+__pycache__/
+
+# Database
+*.sqlite3
+
+/staticfiles/
+/media/
+
+
+.vscode/
