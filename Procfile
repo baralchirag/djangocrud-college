@@ -1,1 +1,1 @@
-web: python inventory_project/manage.py migrate --noinput && gunicorn inventory_project.wsgi --chdir inventory_project
+web: python inventory_project/manage.py migrate --noinput && python inventory_project/manage.py collectstatic --noinput && gunicorn inventory_project.wsgi --chdir inventory_project --bind 0.0.0.0:$PORT --workers 2
