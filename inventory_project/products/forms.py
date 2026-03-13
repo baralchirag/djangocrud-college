@@ -23,5 +23,10 @@ class ProductForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        session_key = kwargs.pop('session_key', None)
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = Category.objects.order_by('name')
+
+        if session_key:
+            self.fields['category'].queryset = Category.objects.filter(session_key=session_key).order_by('name')
+        else:
+            self.fields['category'].queryset = Category.objects.none()
