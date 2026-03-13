@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.db.models import ExpressionWrapper, F, FloatField, Max, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -5,14 +7,17 @@ from .forms import CategoryForm, ProductForm
 from .models import Category, Product
 
 
-def _get_session_key(request):
-	if not request.session.session_key:
-		request.session.create()
-	return request.session.session_key
+def _get_device_key(request):
+	return request.COOKIES.get('device_key') or uuid4().hex
+
+
+def _set_device_cookie(response, device_key):
+	response.set_cookie('device_key', device_key, max_age=60 * 60 * 24 * 365)
+	return response
 
 
 def home(request):
-	session_key = _get_session_key(request)
+	session_key = _get_device_key(request)
 	category_form = CategoryForm()
 	product_form = ProductForm(session_key=session_key)
 
@@ -25,14 +30,14 @@ def home(request):
 				category = category_form.save(commit=False)
 				category.session_key = session_key
 				category.save()
-				return redirect('home')
+				return _set_device_cookie(redirect('home'), session_key)
 		elif form_type == 'product':
 			product_form = ProductForm(request.POST, session_key=session_key)
 			if product_form.is_valid():
 				product = product_form.save(commit=False)
 				product.session_key = session_key
 				product.save()
-				return redirect('home')
+				return _set_device_cookie(redirect('home'), session_key)
 
 	search_query = request.GET.get('q', '').strip()
 	filter_category = request.GET.get('category', '').strip()
@@ -83,18 +88,18 @@ def home(request):
 		'search_query': search_query,
 		'filter_category': filter_category,
 	}
-	return render(request, 'products/home.html', context)
+	return _set_device_cookie(render(request, 'products/home.html', context), session_key)
 
 
 def delete_category(request, pk):
-	session_key = _get_session_key(request)
+	session_key = _get_device_key(request)
 	if request.method == 'POST':
 		get_object_or_404(Category, pk=pk, session_key=session_key).delete()
-	return redirect('home')
+	return _set_device_cookie(redirect('home'), session_key)
 
 
 def edit_category(request, pk):
-	session_key = _get_session_key(request)
+	session_key = _get_device_key(request)
 	category = get_object_or_404(Category, pk=pk, session_key=session_key)
 	if request.method == 'POST':
 		form = CategoryForm(request.POST, instance=category)
@@ -102,21 +107,21 @@ def edit_category(request, pk):
 			updated_category = form.save(commit=False)
 			updated_category.session_key = session_key
 			updated_category.save()
-			return redirect('home')
+			return _set_device_cookie(redirect('home'), session_key)
 	else:
 		form = CategoryForm(instance=category)
-	return render(request, 'products/edit_category.html', {'form': form, 'category': category})
+	return _set_device_cookie(render(request, 'products/edit_category.html', {'form': form, 'category': category}), session_key)
 
 
 def delete_product(request, pk):
-	session_key = _get_session_key(request)
+	session_key = _get_device_key(request)
 	if request.method == 'POST':
 		get_object_or_404(Product, pk=pk, session_key=session_key).delete()
-	return redirect('home')
+	return _set_device_cookie(redirect('home'), session_key)
 
 
 def edit_product(request, pk):
-	session_key = _get_session_key(request)
+	session_key = _get_device_key(request)
 	product = get_object_or_404(Product, pk=pk, session_key=session_key)
 	if request.method == 'POST':
 		form = ProductForm(request.POST, instance=product, session_key=session_key)
@@ -124,7 +129,7 @@ def edit_product(request, pk):
 			updated_product = form.save(commit=False)
 			updated_product.session_key = session_key
 			updated_product.save()
-			return redirect('home')
+			return _set_device_cookie(redirect('home'), session_key)
 	else:
 		form = ProductForm(instance=product, session_key=session_key)
-	return render(request, 'products/edit_product.html', {'form': form, 'product': product})
+	return _set_device_cookie(render(request, 'products/edit_product.html', {'form': form, 'product': product}), session_key)

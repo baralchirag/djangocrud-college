@@ -1,1 +1,1 @@
-web: gunicorn inventory_project.inventory_project.wsgi
+web: python inventory_project/manage.py migrate --noinput && gunicorn inventory_project.wsgi --chdir inventory_project
