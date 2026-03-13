@@ -29,11 +29,13 @@ ALLOWED_HOSTS = [
     "djangoinventory.up.railway.app",
     "localhost",
     "djangocrud-college.vercel.app",
+    "web-production-828e1f.up.railway.app",
     "127.0.0.1"
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://djangoinventory.up.railway.app",
     "https://djangocrud-college.vercel.app",
+    "https://web-production-828e1f.up.railway.app",
 ]
 
 # Application definition
